@@ -1,2 +1,3 @@
 # jenkins-heroku
-Dockerized Jenkins instance to be deployed on Heroku
+
+Deploy officially dockerized Jenkins on Heroku.

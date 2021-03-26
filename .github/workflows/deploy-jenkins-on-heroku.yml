@@ -1,0 +1,47 @@
+name: Pipeline - Deploy officially dockerized Jenkins on Heroku
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      HEROKU_REGISTRY: registry.heroku.com
+      HEROKU_APP_NAME: jenkins-dyno
+      OFFICIAL_JENKINS: jenkins/jenkins:lts
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # build jenkins image
+      - name: Build an official jenkins image with the memory limitation
+        run: |
+          docker build -t ${{ env.HEROKU_REGISTRY }}/${{ env.HEROKU_APP_NAME }}/web -f ./Dockerfile .
+
+      # push jenkins image to heroku
+      - name: Heroku docker registry - login
+        run: |
+          echo "${{ secrets.HEROKU_API_KEY }}" | docker login -u ${{ secrets.HEROKU_USER }} ${{ env.HEROKU_REGISTRY }} --password-stdin
+
+      - name: Heroku docker registry - push backend image
+        run: |
+          docker image push ${{ env.HEROKU_REGISTRY }}/${{ env.HEROKU_APP_NAME }}/web
+
+      - name: Heroku - deploy Jenkins instance
+        run: |
+          HEROKU_API_KEY=${{ secrets.HEROKU_API_KEY }} heroku container:release web -a ${{ env.HEROKU_APP_NAME }}
+
+      - name: Heroku logout
+        run: |
+          docker logout ${{ env.HEROKU_REGISTRY }}
+
+      # slack notification
+      - name: Send notification to slack
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_TITLE: Commit - ${{ github.event.head_commit.message }}
+          SLACK_MESSAGE: Good news - Jenkins instance is deployed on Heroku
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
