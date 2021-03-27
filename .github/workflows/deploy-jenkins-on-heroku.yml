@@ -18,7 +18,7 @@ jobs:
       # build jenkins image
       - name: Build an official jenkins image with the memory limitation
         run: |
-          docker build -t ${{ env.HEROKU_REGISTRY }}/${{ env.HEROKU_APP_NAME }}/web -f ./Dockerfile .
+          docker build --build-arg JENKINS_USER=${{ secrets.JENKINS_USER }} --build-arg JENKINS_PASSWORD=${{ secrets.JENKINS_PASSWORD }} -t ${{ env.HEROKU_REGISTRY }}/${{ env.HEROKU_APP_NAME }}/web -f ./Dockerfile .
 
       # push jenkins image to heroku
       - name: Heroku docker registry - login
