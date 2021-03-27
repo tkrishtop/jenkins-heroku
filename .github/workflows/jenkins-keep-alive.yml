@@ -1,4 +1,4 @@
-name: Schedule job - ping Jenkins each 20 min
+name: Schedule job - Ping Jenkins each 20 min
 
 on:
   schedule:
@@ -8,12 +8,11 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     env:
-      HEROKU_REGISTRY: registry.heroku.com
-      HEROKU_APP_NAME: jenkins-dyno
+      HEROKU_APP_URL: https://jenkins-dyno.herokuapp.com/
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Ping Jenkins
         run: |
-          curl ${{ env.HEROKU_REGISTRY }}/${{ env.HEROKU_APP_NAME }}
+          curl ${{ env.HEROKU_APP_URL }}
