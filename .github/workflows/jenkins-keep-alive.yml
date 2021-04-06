@@ -1,8 +1,8 @@
-name: Schedule job - Ping Jenkins each 20 min
+name: Schedule job - Ping Jenkins each 9 min
 
 on:
   schedule:
-    - cron:  '*/20 * * * *'
+    - cron:  '*/9 * * * *'
 
 jobs:
   build:
